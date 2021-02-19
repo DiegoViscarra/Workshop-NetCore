@@ -10,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
+using workshop_api.Services;
 
 namespace workshop_api
 {
@@ -26,6 +28,13 @@ namespace workshop_api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            services.AddSwaggerGen(p =>
+            {
+                p.SwaggerDoc("v3", new OpenApiInfo { Title = "Workshop API", Version = "v3"});
+            });
+
+            services.AddSingleton<IWorkshopServices, WorkshopServices>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -45,6 +54,13 @@ namespace workshop_api
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+            });
+
+            app.UseSwagger();
+
+            app.UseSwaggerUI (p=>
+            {
+                p.SwaggerEndpoint("/swagger/v3/swagger.json", "Workshop API V3");
             });
         }
     }
