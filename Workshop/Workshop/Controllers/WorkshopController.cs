@@ -6,6 +6,8 @@ using Workshop.Models;
 using Workshop.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using WorkshopLibrary.Exceptions;
+using System.Net;
 
 namespace Workshop.Controllers
 {
@@ -25,9 +27,9 @@ namespace Workshop.Controllers
             {
                 return Ok(_workshopServices.GetWorkshops());
             }
-            catch
+            catch (Exception ex)
             {
-                return BadRequest("URL mal escrita");
+                return this.StatusCode(StatusCodes.Status404NotFound, ex.Message);
             }
         }
 
@@ -38,17 +40,32 @@ namespace Workshop.Controllers
             {
                 return Ok(_workshopServices.GetWorkshop(id));
             }
+            catch (NotFoundItemException ex)
+            {
+                return this.StatusCode(StatusCodes.Status404NotFound, ex.Message);
+            }
             catch
             {
-                return NotFound("Este workshop no se encuentra registrado");
+                throw new Exception("Workshop was not found");
             }
         }
 
         [HttpPost]
         public ActionResult<WorkshopModel> PostWorkshop([FromBody] WorkshopModel workshops)
         {
-            var newworkshop = _workshopServices.CreateWorkshop(workshops);
-            return Created($"/workshop/{newworkshop.Id}", newworkshop);
+            try
+            {
+                var newworkshop = _workshopServices.CreateWorkshop(workshops);
+                return Created($"/workshop/{newworkshop.Id}", newworkshop);
+            }
+            catch (WrongOperationException ex)
+            {
+                return this.StatusCode(StatusCodes.Status409Conflict, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return this.StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
 
         [HttpPut("{id}")]
@@ -57,14 +74,16 @@ namespace Workshop.Controllers
             try
             {
                 var res = _workshopServices.EditWorkshop(id, workshops);
-                if (res)
-                    return Ok(res);
-                else
-                    return NotFound("No se encontro el workshop");
+                return Ok(res);
+
             }
-            catch
+            catch (NotFoundItemException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError);
+                return this.StatusCode(StatusCodes.Status404NotFound, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return this.StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
 
@@ -75,7 +94,9 @@ namespace Workshop.Controllers
             {
                 var res = _workshopServices.DeleteWorkshop(id);
                 if (!res)
+                {
                     return StatusCode(StatusCodes.Status500InternalServerError, "No se puede eliminar el workshop");
+                }
                 return Ok(res);
             }
             catch (Exception ex)
@@ -90,14 +111,15 @@ namespace Workshop.Controllers
             try
             {
                 var res = _workshopServices.ChangeStatusWorkshop(id, action);
-                if (res)
-                    return Ok(res);
-                else
-                    return NotFound("No se encontro el workshop");
+                return Ok(res);
             }
-            catch
+            catch (WrongOperationException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError);
+                return this.StatusCode(StatusCodes.Status409Conflict, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return this.StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
 

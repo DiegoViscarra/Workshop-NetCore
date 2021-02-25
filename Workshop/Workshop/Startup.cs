@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Workshop.Services;
+using WorkshopLibrary.Extensions;
 
 namespace Workshop
 {
@@ -28,10 +29,7 @@ namespace Workshop
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+            app.UseNativeGlobalExceptionHandler();
 
             app.UseHttpsRedirection();
 

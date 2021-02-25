@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Workshop.Models;
+using WorkshopLibrary.Exceptions;
 
 namespace Workshop.Services
 {
@@ -44,10 +45,16 @@ namespace Workshop.Services
                     workshop.Id = valid.Id + 1;
                 }
                 else
+                {
                     workshop.Id = 1;
-                if(workshop.Status == null)
+                }
+                if(workshop.Status == null || workshop.Status == "Scheduled")
                 {
                     workshop.Status = "Scheduled";
+                }
+                else
+                {
+                    throw new WrongOperationException("Status has to be Scheduled or Postponed or Cancelled");
                 }
                 _workshops.Add(workshop);
             }
@@ -82,7 +89,7 @@ namespace Workshop.Services
             }
             else
             {
-                throw new Exception();
+                throw new NotFoundItemException("The workshop was not found in the DB");
             }
         }
 
@@ -95,7 +102,7 @@ namespace Workshop.Services
             }
             else
             {
-                throw new Exception();
+                throw new NotFoundItemException("The workshop was not found in the DB");
             }
         }
 
@@ -111,17 +118,17 @@ namespace Workshop.Services
             {
                 if(Status == "postpone")
                 {
-                    newWorkshopStatus.Status = Status;
+                    newWorkshopStatus.Status = "Postponed";
                 }
                 else if(Status == "cancel")
                 {
-                    newWorkshopStatus.Status = Status;
+                    newWorkshopStatus.Status = "Cancelled";
                 }
                 return true;
             }
             else
             {
-                throw new Exception();
+                throw new WrongOperationException("Status has to be postpone or cancel");
             }
         }
     }
