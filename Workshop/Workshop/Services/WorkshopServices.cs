@@ -2,30 +2,30 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using workshop_api.Models;
+using Workshop.Models;
 
-namespace workshop_api.Services
+namespace Workshop.Services
 {
     public class WorkshopServices : IWorkshopServices
     {
-        private static List<Workshop> workshops;
+        private static List<WorkshopModel> _workshops;
         public WorkshopServices()
         {
-            workshops = new List<Workshop>()
+            _workshops = new List<WorkshopModel>()
             {
-                new Workshop()
+                new WorkshopModel()
                 {
                     Id=1,
                     Name="SoftSkills and Rules",
                     Status="Scheduled"
                 },
-                new Workshop()
+                new WorkshopModel()
                 {
                     Id=2,
                     Name="Calidad en Software Comercial",
                     Status="Scheduled"
                 },
-                new Workshop()
+                new WorkshopModel()
                 {
                     Id=3,
                     Name="Bases de Datos",
@@ -34,11 +34,11 @@ namespace workshop_api.Services
             };
         }
 
-        public Workshop CreateWorkshop(Workshop workshop)
+        public WorkshopModel CreateWorkshop(WorkshopModel workshop)
         {
             if (workshop.Id == null)
             {
-                var valid = workshops.OrderByDescending(a => a.Id).FirstOrDefault();
+                var valid = _workshops.OrderByDescending(a => a.Id).FirstOrDefault();
                 if (valid != null)
                 {
                     workshop.Id = valid.Id + 1;
@@ -49,30 +49,30 @@ namespace workshop_api.Services
                 {
                     workshop.Status = "Scheduled";
                 }
-                workshops.Add(workshop);
+                _workshops.Add(workshop);
             }
             else
             {
-                workshops.Add(workshop);
+                _workshops.Add(workshop);
             }
             return workshop;
         }
 
         public bool DeleteWorkshop(int Id)
         {
-            var valid = workshops.SingleOrDefault(b => b.Id == Id);
+            var valid = _workshops.SingleOrDefault(b => b.Id == Id);
+            var ans = false;
             if (valid != null)
             {
-                workshops.Remove(valid);
-                return true;
+                _workshops.Remove(valid);
+                ans = true;
             }
-            else
-                return false;
+            return ans;
         }
 
-        public bool EditWorkshop(int Id, Workshop workshop)
+        public bool EditWorkshop(int Id, WorkshopModel workshop)
         {
-            var newWorkshop = workshops.SingleOrDefault(c => c.Id == Id);
+            var newWorkshop = _workshops.SingleOrDefault(c => c.Id == Id);
             if (newWorkshop != null)
             {
                 newWorkshop.Id = workshop.Id;
@@ -81,36 +81,48 @@ namespace workshop_api.Services
                 return true;
             }
             else
+            {
                 throw new Exception();
+            }
         }
 
-        public Workshop GetWorkshop(int Id)
+        public WorkshopModel GetWorkshop(int Id)
         {
-            var getworkshop = workshops.SingleOrDefault(e => e.Id == Id);
+            var getworkshop = _workshops.SingleOrDefault(e => e.Id == Id);
             if (getworkshop != null)
+            {
                 return getworkshop;
+            }
             else
+            {
                 throw new Exception();
+            }
         }
 
-        public IEnumerable<Workshop> GetWorkshops()
+        public IEnumerable<WorkshopModel> GetWorkshops()
         {
-            return workshops.OrderBy(d => d.Id);
+            return _workshops.OrderBy(d => d.Id);
         }
 
         public bool ChangeStatusWorkshop(int Id, string Status)
         {
-            var newWorkshopStatus = workshops.SingleOrDefault(c => c.Id == Id);
+            var newWorkshopStatus = _workshops.SingleOrDefault(c => c.Id == Id);
             if (newWorkshopStatus != null)
             {
-                if(Status == "Postponed")
+                if(Status == "postpone")
+                {
                     newWorkshopStatus.Status = Status;
-                else if(Status == "Cancelled")
+                }
+                else if(Status == "cancel")
+                {
                     newWorkshopStatus.Status = Status;
+                }
                 return true;
             }
             else
+            {
                 throw new Exception();
+            }
         }
     }
 }

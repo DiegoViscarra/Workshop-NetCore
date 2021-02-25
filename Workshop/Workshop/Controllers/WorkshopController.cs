@@ -2,28 +2,28 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using workshop_api.Models;
-using workshop_api.Services;
+using Workshop.Models;
+using Workshop.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace workshop_api.Controllers
+namespace Workshop.Controllers
 {
     [Route("[controller]")]
     public class WorkshopController : ControllerBase
     {
-        private readonly IWorkshopServices workshopServices;
+        private readonly IWorkshopServices _workshopServices;
         public WorkshopController(IWorkshopServices workshopServices)
         {
-            this.workshopServices = workshopServices;
+            this._workshopServices = workshopServices;
         }
-        // GET values
+
         [HttpGet]
-        public ActionResult<IEnumerable<Workshop>> GetWorkshops()
+        public ActionResult<IEnumerable<WorkshopModel>> GetWorkshops()
         {
             try
             {
-                return Ok(workshopServices.GetWorkshops());
+                return Ok(_workshopServices.GetWorkshops());
             }
             catch
             {
@@ -31,13 +31,12 @@ namespace workshop_api.Controllers
             }
         }
 
-        // GET values/5
         [HttpGet("{id}")]
-        public ActionResult<Workshop> GetWorkshop(int id)
+        public ActionResult<WorkshopModel> GetWorkshop([FromRoute] int id)
         {
             try
             {
-                return Ok(workshopServices.GetWorkshop(id));
+                return Ok(_workshopServices.GetWorkshop(id));
             }
             catch
             {
@@ -45,22 +44,19 @@ namespace workshop_api.Controllers
             }
         }
 
-        // POST values
         [HttpPost]
-        public ActionResult<Workshop> PostWorkshop([FromBody] Workshop workshops)
+        public ActionResult<WorkshopModel> PostWorkshop([FromBody] WorkshopModel workshops)
         {
-            var newworkshop = workshopServices.CreateWorkshop(workshops);
+            var newworkshop = _workshopServices.CreateWorkshop(workshops);
             return Created($"/workshop/{newworkshop.Id}", newworkshop);
-            //Console.WriteLine(workshops);
         }
 
-        // PUT values/5
         [HttpPut("{id}")]
-        public ActionResult<bool> PutWorkshop(int id, [FromBody] Workshop workshops)
+        public ActionResult<bool> PutWorkshop([FromRoute] int id, [FromBody] WorkshopModel workshops)
         {
             try
             {
-                var res = workshopServices.EditWorkshop(id, workshops);
+                var res = _workshopServices.EditWorkshop(id, workshops);
                 if (res)
                     return Ok(res);
                 else
@@ -72,13 +68,12 @@ namespace workshop_api.Controllers
             }
         }
 
-        // DELETE values/5
         [HttpDelete("{id}")]
-        public ActionResult<bool> DeleteWorkshop(int id)
+        public ActionResult<bool> DeleteWorkshop([FromRoute] int id)
         {
             try
             {
-                var res = workshopServices.DeleteWorkshop(id);
+                var res = _workshopServices.DeleteWorkshop(id);
                 if (!res)
                     return StatusCode(StatusCodes.Status500InternalServerError, "No se puede eliminar el workshop");
                 return Ok(res);
@@ -89,13 +84,12 @@ namespace workshop_api.Controllers
             }
         }
 
-        // PUT values/5/Status
-        [HttpPut("{id:int}/{status}")]
-        public ActionResult<bool> CancelPostponeWorkshop(int id, string status)
+        [HttpPut("{id:int}/status/{action}")]
+        public ActionResult<bool> CancelPostponeWorkshop([FromRoute] int id, [FromRoute] string action)
         {
             try
             {
-                var res = workshopServices.ChangeStatusWorkshop(id, status);
+                var res = _workshopServices.ChangeStatusWorkshop(id, action);
                 if (res)
                     return Ok(res);
                 else

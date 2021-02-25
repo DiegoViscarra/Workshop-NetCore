@@ -1,43 +1,31 @@
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.OpenApi.Models;
-using workshop_api.Services;
+using Workshop.Services;
 
-namespace workshop_api
+namespace Workshop
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
-
-        public IConfiguration Configuration { get; }
-
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
 
+            services.AddSingleton<IWorkshopServices, WorkshopServices>();
+
             services.AddSwaggerGen(p =>
             {
-                p.SwaggerDoc("v3", new OpenApiInfo { Title = "Workshop API", Version = "v3"});
+                p.SwaggerDoc("v3", new OpenApiInfo { Title = "Workshop API", Version = "v3" });
             });
-
-            services.AddSingleton<IWorkshopServices, WorkshopServices>();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -58,7 +46,7 @@ namespace workshop_api
 
             app.UseSwagger();
 
-            app.UseSwaggerUI (p=>
+            app.UseSwaggerUI(p =>
             {
                 p.SwaggerEndpoint("/swagger/v3/swagger.json", "Workshop API V3");
             });
