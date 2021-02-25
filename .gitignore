@@ -32,7 +32,7 @@ bld/
 msbuild.log
 msbuild.err
 msbuild.wrn
-workshop-api/obj
+workshop-api/obj/
 
 # Visual Studio 2015
 .vs/
