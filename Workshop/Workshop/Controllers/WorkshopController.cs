@@ -93,11 +93,11 @@ namespace Workshop.Controllers
             try
             {
                 var res = _workshopServices.DeleteWorkshop(id);
-                if (!res)
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError, "No se puede eliminar el workshop");
-                }
                 return Ok(res);
+            }
+            catch (NotFoundItemException ex)
+            {
+                return this.StatusCode(StatusCodes.Status404NotFound, ex.Message);
             }
             catch (Exception ex)
             {
