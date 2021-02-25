@@ -74,23 +74,29 @@ namespace Workshop.Services
                 _workshops.Remove(valid);
                 ans = true;
             }
+            else
+            {
+                throw new NotFoundItemException("The workshop was not found in the DB");
+            }
             return ans;
         }
 
         public bool EditWorkshop(int Id, WorkshopModel workshop)
         {
             var newWorkshop = _workshops.SingleOrDefault(c => c.Id == Id);
+            var ans = false;
             if (newWorkshop != null)
             {
                 newWorkshop.Id = workshop.Id;
                 newWorkshop.Name = workshop.Name;
                 newWorkshop.Status = workshop.Status;
-                return true;
+                ans = true;
             }
             else
             {
                 throw new NotFoundItemException("The workshop was not found in the DB");
             }
+            return ans;
         }
 
         public WorkshopModel GetWorkshop(int Id)
@@ -114,22 +120,25 @@ namespace Workshop.Services
         public bool ChangeStatusWorkshop(int Id, string Status)
         {
             var newWorkshopStatus = _workshops.SingleOrDefault(c => c.Id == Id);
+            var ans = false;
             if (newWorkshopStatus != null)
             {
                 if(Status == "postpone")
                 {
+                    ans = true;
                     newWorkshopStatus.Status = "Postponed";
                 }
                 else if(Status == "cancel")
                 {
+                    ans = true;
                     newWorkshopStatus.Status = "Cancelled";
                 }
-                return true;
             }
             else
             {
                 throw new WrongOperationException("Status has to be postpone or cancel");
             }
+            return ans;
         }
     }
 }
